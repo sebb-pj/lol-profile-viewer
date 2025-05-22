@@ -7,9 +7,19 @@ function App() {
   const [region, setRegion] = useState('eun1'); // default to EUNE
   const [summoner, setSummoner] = useState(null);
   const [ranked, setRanked] = useState([]);
+  const [gameVersion, setGameVersion] = useState('');
 
 const handleFetch = async () => {
   try {
+
+    // 0. Obtain game version
+    const versionRes = await fetch('http://localhost:3001/version');
+    const versionData = await versionRes.json();
+    console.log("Version data:", versionData); // Should contain the game version
+    const currentVersion = versionData[0]; // Assuming the first version is the latest
+    console.log("Game version:", currentVersion); // Should contain the game version
+    setGameVersion(currentVersion);
+
     // 👇 Convert platform region to Riot routing region for Riot ID API
     const riotRoutingRegion = region === 'eun1' || region === 'euw1' ? 'europe'
                             : region === 'na1' || region === 'br1' || region === 'la1' || region === 'la2' ? 'americas'
@@ -76,7 +86,7 @@ const handleFetch = async () => {
           <h2>{summoner.name}</h2>
           <p>Level: {summoner.summonerLevel}</p>
           <img
-            src={`http://ddragon.leagueoflegends.com/cdn/14.9.1/img/profileicon/${summoner.profileIconId}.png`}
+            src={`http://ddragon.leagueoflegends.com/cdn/${gameVersion}/img/profileicon/${summoner.profileIconId}.png`}
             alt="Profile Icon"
             width={64}
           />
