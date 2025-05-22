@@ -10,6 +10,17 @@ app.use(cors());
 const PORT = process.env.PORT || 3001;
 const RIOT_API_KEY = process.env.RIOT_API_KEY;
 
+//Route to get game version
+app.get('/version', async (req, res) => {
+  console.log('Fetching game version');
+  try {
+    const response = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json');
+    res.json(response.data); // returns an array of versions
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch game version', details: error.message });
+  }
+});
+
 // Route to get summoner data
 app.get('/account/:region/:gameName/:tagLine', async (req, res) => {
   const { region, gameName, tagLine } = req.params;
