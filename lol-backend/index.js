@@ -80,7 +80,24 @@ app.get('/profile/:region/:puuid', async (req, res) => {
   }
 });
 
+app.get('/mastery/:region/:puuid', async (req, res) => {
+  const { region, puuid } = req.params;
+  console.log(`Fetching mastery for PUUID ${puuid} in region ${region}`);
 
+  try {
+    const response = await axios.get(
+      `https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=5`,
+      {
+        headers: {
+          'X-Riot-Token': RIOT_API_KEY,
+        },
+      }
+    );
+    res.json(response.data); // contains mastery data
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch mastery data', details: error.message });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
