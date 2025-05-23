@@ -86,7 +86,7 @@ app.get('/mastery/:region/:puuid', async (req, res) => {
 
   try {
     const response = await axios.get(
-      `https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=5`,
+      `https://${region}.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top?count=6`,
       {
         headers: {
           'X-Riot-Token': RIOT_API_KEY,
