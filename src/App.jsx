@@ -1,5 +1,6 @@
 // src/App.jsx
 import { useState } from 'react'
+import { useEffect } from 'react';
 
 function App() {
   const [gameName, setGameName] = useState('');
@@ -8,6 +9,34 @@ function App() {
   const [summoner, setSummoner] = useState(null);
   const [ranked, setRanked] = useState([]);
   const [gameVersion, setGameVersion] = useState('');
+  const [favorites, setFavorites] = useState([]);
+  const [champions, setChampions] = useState({});
+  const [champIdToData, setChampIdToData] = useState({});
+
+  useEffect(() => {
+  const fetchChampions = async () => {
+    const response = await fetch("https://ddragon.leagueoflegends.com/cdn/15.10.1/data/en_US/champion.json");
+    const data = await response.json();
+
+    setChampions(data.data); 
+
+  };
+
+  fetchChampions();
+}, []);
+
+useEffect(() => {
+  const idToName = {};
+  Object.values(champions).forEach(champ => {
+      idToName[champ.key] = {
+        id: champ.key,
+        name: champ.name,
+        code: champ.id, 
+      }
+    });
+
+    setChampIdToData(idToName);
+}, [champions]);
 
 const handleFetch = async () => {
   try {
@@ -15,9 +44,7 @@ const handleFetch = async () => {
     // 0. Obtain game version
     const versionRes = await fetch('http://localhost:3001/version');
     const versionData = await versionRes.json();
-    console.log("Version data:", versionData); // Should contain the game version
-    const currentVersion = versionData[0]; // Assuming the first version is the latest
-    console.log("Game version:", currentVersion); // Should contain the game version
+    const currentVersion = versionData[0]; // Latest version
     setGameVersion(currentVersion);
 
     // 👇 Convert platform region to Riot routing region for Riot ID API
@@ -37,7 +64,6 @@ const handleFetch = async () => {
     const profileRes = await fetch(`http://localhost:3001/profile/${region}/${puuid}`);
     const profileData = await profileRes.json();
 
-    console.log("Profile responsoe:", profileRes);
     console.log("Profile data:", profileData);
     console.log("Summoner:", profileData.summoner);
     console.log("Ranked Stats:", profileData.rankedStats);
@@ -45,17 +71,23 @@ const handleFetch = async () => {
     // 3. Update state
     setSummoner(profileData.summoner);
     setRanked(profileData.rankedStats);
+
+    // 4. Add favorite champs
+    const favoriteChamps = await fetch(`http://localhost:3001/mastery/${region}/${puuid}`);
+    const favoriteChampsData = await favoriteChamps.json();
+    const favoriteChampsIds = favoriteChampsData.map(champ => champ.championId);
+    setFavorites(favoriteChampsIds);
+    console.log("Favorites:", favorites);
+
   } catch (err) {
     console.error("Error fetching profile info:", err);
   }
 };
 
-
-
   return (
     <>
-    <div style={{ padding: '2rem' }}>
-      <h1>League of Legends Profile Viewer</h1>
+    <div className='main-content' style={{ padding: '2rem' }}>
+      <h1>League of Stats</h1>
 
       <input
         type="text"
@@ -80,7 +112,7 @@ const handleFetch = async () => {
 
       <button onClick={handleFetch}>Get Stats</button>
     </div>
-    <div>
+    <div className='profile-card'>
       {summoner && (
         <div>
           <h2>{summoner.name}</h2>
@@ -108,6 +140,25 @@ const handleFetch = async () => {
               </p>
             </div>
           ))}
+        </div>
+      )}
+
+      {favorites.length > 0 &&(
+        <div>
+          <h3>Favorite Champions:</h3>
+          {favorites.map((champ)=> {
+            const champData = champIdToData[champ];
+            return (
+              <div key={champ}>
+                <p>{champData.name}</p>
+                <img
+                  src={`http://ddragon.leagueoflegends.com/cdn/${gameVersion}/img/champion/${champData.code}.png`}
+                  alt={champData.name}
+                  width={64}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
