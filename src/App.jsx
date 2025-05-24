@@ -106,7 +106,7 @@ const handleFetch = async () => {
     <div className="app">
       <div className='main-content'>
         <AnimatedLogo />
-        <h1 style={{marginBlockStart: 0}}>League of Stats</h1>
+        <h1 style={{marginBlockStart: 0, marginBlockEnd: "1rem"}}>League of Stats</h1>
 
         <div className='input-container'>
           <input
@@ -138,18 +138,19 @@ const handleFetch = async () => {
       </div>
       <div className={summoner ? 'profile-card' : 'null'}>
         {summoner && (
-          <>
-            <h2>{currentName}</h2>
+          <div className='profile-header'>
             <div>
-              <h2>{summoner.name}</h2>
-              <p>Level: {summoner.summonerLevel}</p>
               <img
                 src={`http://ddragon.leagueoflegends.com/cdn/${gameVersion}/img/profileicon/${summoner.profileIconId}.png`}
                 alt="Profile Icon"
                 width={64}
               />
             </div>
-          </>
+            <div>
+              <h2>{currentName}</h2>
+              <p>Level: {summoner.summonerLevel}</p>
+            </div>
+          </div>
         )}
 
         {favorites.length > 0 &&(

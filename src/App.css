@@ -86,8 +86,12 @@ input::placeholder{
   background-color: #000000CC;
   min-width: 120px;
   margin: 5px;
-  border: 1px solid #4F9D69;
+  border: 1px solid #272727;
   border-radius: 10px;
+}
+
+.favorite-champs>div>p{
+  margin: 0;
 }
 
 .ranked-stats{
@@ -95,4 +99,19 @@ input::placeholder{
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
+}
+
+.profile-header{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  column-gap: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-header>div>h2, .profile-header>div>p{
+  margin: 0;
+  padding: 0.5rem;
+  color: #F2F7F2;
 }
