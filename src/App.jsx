@@ -1,9 +1,11 @@
-// src/App.jsx
+import './App.css';
 import { useState } from 'react'
 import { useEffect } from 'react';
+import AnimatedLogo from './AnimatedLogo.jsx';
 
 function App() {
   const [gameName, setGameName] = useState('');
+  const [currentName, setCurrentName] = useState('');
   const [tagLine, setTagLine] = useState('');
   const [region, setRegion] = useState('eun1'); // default to EUNE
   const [summoner, setSummoner] = useState(null);
@@ -12,6 +14,18 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const [champions, setChampions] = useState({});
   const [champIdToData, setChampIdToData] = useState({});
+
+  const queueNameMap = {
+  "RANKED_SOLO_5x5": "Ranked Solo",
+  "RANKED_FLEX_SR": "Ranked Flex",
+  };
+
+  function formatQueueName(queue) {
+  return queue
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
 
   useEffect(() => {
   const fetchChampions = async () => {
@@ -37,6 +51,10 @@ useEffect(() => {
 
     setChampIdToData(idToName);
 }, [champions]);
+
+useEffect(() => {
+  setCurrentName(gameName);
+}, [summoner]);
 
 const handleFetch = async () => {
   try {
@@ -85,84 +103,101 @@ const handleFetch = async () => {
 };
 
   return (
-    <>
-    <div className='main-content' style={{ padding: '2rem' }}>
-      <h1>League of Stats</h1>
+    <div className="app">
+      <div className='main-content'>
+        <AnimatedLogo />
+        <h1 style={{marginBlockStart: 0, marginBlockEnd: "1rem"}}>League of Stats</h1>
 
-      <input
-        type="text"
-        placeholder="Summoner Name"
-        value={gameName}
-        onChange={(e) => setGameName(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Tag Line (e.g. EUNE)"
-        value={tagLine}
-        onChange={(e) => setTagLine(e.target.value)}
-      />
-      <select value={region} onChange={(e) => setRegion(e.target.value)}>
-        <option value="eun1">EUNE</option>
-        <option value="euw1">EUW</option>
-        <option value="na1">NA</option>
-        <option value="kr">Korea</option>
-        <option value="br1">Brazil</option>
-        {/* Not adding more at the moment */}
-      </select>
-
-      <button onClick={handleFetch}>Get Stats</button>
-    </div>
-    <div className='profile-card'>
-      {summoner && (
-        <div>
-          <h2>{summoner.name}</h2>
-          <p>Level: {summoner.summonerLevel}</p>
-          <img
-            src={`http://ddragon.leagueoflegends.com/cdn/${gameVersion}/img/profileicon/${summoner.profileIconId}.png`}
-            alt="Profile Icon"
-            width={64}
+        <div className='input-container'>
+          <input
+            type="text"
+            placeholder="Summoner Name"
+            value={gameName}
+            onChange={(e) => setGameName(e.target.value)}
           />
+          <div>
+            <span>#</span>
+            <input
+              type="text"
+              placeholder="Tag Line (e.g. EUNE)"
+              value={tagLine}
+              onChange={(e) => setTagLine(e.target.value)}
+            />
+          </div>
+          <select value={region} onChange={(e) => setRegion(e.target.value)}>
+            <option value="eun1">EUNE</option>
+            <option value="euw1">EUW</option>
+            <option value="na1">NA</option>
+            <option value="kr">Korea</option>
+            <option value="br1">Brazil</option>
+            {/* Not adding more at the moment */}
+          </select>
         </div>
-      )}
-
-      {ranked.length > 0 && (
-        <div>
-          <h3>Ranked Stats:</h3>
-          {ranked.map((entry) => (
-            <div key={entry.queueType}>
-              <p>Queue: {entry.queueType}</p>
-              <p>
-                {entry.tier} {entry.rank} - {entry.leaguePoints} LP
-              </p>
-              <p>
-                Wins: {entry.wins}, Losses: {entry.losses}, Winrate:{" "}
-                {Math.round((entry.wins / (entry.wins + entry.losses)) * 100)}%
-              </p>
+        <br/>
+        <button onClick={handleFetch}>Get Stats!</button>
+      </div>
+      <div className={summoner ? 'profile-card' : 'null'}>
+        {summoner && (
+          <div className='profile-header'>
+            <div>
+              <img
+                src={`http://ddragon.leagueoflegends.com/cdn/${gameVersion}/img/profileicon/${summoner.profileIconId}.png`}
+                alt="Profile Icon"
+                width={64}
+              />
             </div>
-          ))}
-        </div>
-      )}
+            <div>
+              <h2>{currentName}</h2>
+              <p>Level: {summoner.summonerLevel}</p>
+            </div>
+          </div>
+        )}
 
-      {favorites.length > 0 &&(
-        <div>
-          <h3>Favorite Champions:</h3>
-          {favorites.map((champ)=> {
-            const champData = champIdToData[champ];
-            return (
-              <div key={champ}>
-                <p>{champData.name}</p>
-                <img
-                  src={`http://ddragon.leagueoflegends.com/cdn/${gameVersion}/img/champion/${champData.code}.png`}
-                  alt={champData.name}
-                  width={64}
-                />
-              </div>
-            );
-          })}
-        </div>
-      )}
+        {favorites.length > 0 &&(
+          <div className='fav-champ-container' style={{backgroundImage: favorites.length > 0 ? `url(https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${champIdToData[favorites[0]].code}_0.jpg)` : 'none'}}> 
+            <h3>Favorite Champions:</h3>
+            <div className="favorite-champs">
+              {favorites.map((champ)=> {
+                const champData = champIdToData[champ];
+                return (
+                  <div key={champ}>
+                    <p>{champData.name}</p>
+                    <img
+                      src={`http://ddragon.leagueoflegends.com/cdn/${gameVersion}/img/champion/${champData.code}.png`}
+                      alt={champData.name}
+                      width={64}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {ranked.length > 0 && (
+          <>
+          <h3>Ranked Stats:</h3>
+            <div className='ranked-stats'>
+              {ranked.map((entry) => {
+                const queueClean = queueNameMap[entry.queueType] || formatQueueName(entry.queueType);
+                return(<div key={queueClean}>
+                  <p>{queueClean}</p>
+                  <p>
+                    {entry.tier} {entry.rank} - {entry.leaguePoints} LP
+                  </p>
+                  <p>
+                    Wins: {entry.wins}, Losses: {entry.losses}, Winrate: {Math.round((entry.wins / (entry.wins + entry.losses)) * 100)}%
+                  </p>
+                </div>
+                )
+              })}
+            </div>
+          </>
+        )}
+
+        
+      </div>
     </div>
-  </>
   );
 }
 
