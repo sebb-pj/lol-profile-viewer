@@ -2,6 +2,7 @@ import express from 'express';
 import axios from 'axios';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config();
 const app = express();
@@ -9,6 +10,9 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3001;
 const RIOT_API_KEY = process.env.RIOT_API_KEY;
+
+const clientPath = path.join(__dirname, '..', 'dist');
+app.use(express.static(clientPath));
 
 //Route to get game version
 app.get('/version', async (req, res) => {
@@ -97,6 +101,10 @@ app.get('/mastery/:region/:puuid', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch mastery data', details: error.message });
   }
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientPath, 'index.html'));
 });
 
 app.listen(PORT, () => {

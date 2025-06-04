@@ -106,7 +106,7 @@ const handleFetch = async () => {
     <div className="app">
       <div className='main-content'>
         <AnimatedLogo />
-        <h1 style={{marginBlockStart: 0, marginBlockEnd: "1rem"}}>League of Stats</h1>
+        <h1 style={{marginBlockStart: 0, marginBlockEnd: "2rem"}}>League of Stats</h1>
 
         <div className='input-container'>
           <input
@@ -194,8 +194,9 @@ const handleFetch = async () => {
             </div>
           </>
         )}
-
-        
+      </div>
+      <div className='footer-container'>
+        <p style={{ fontSize: '10px', color: '#888' }}>League of Stats isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.</p>
       </div>
     </div>
   );
