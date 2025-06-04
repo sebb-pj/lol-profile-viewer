@@ -3,6 +3,8 @@ import axios from 'axios';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
 dotenv.config();
 const app = express();
@@ -11,12 +13,16 @@ app.use(cors());
 const PORT = process.env.PORT || 3001;
 const RIOT_API_KEY = process.env.RIOT_API_KEY;
 
-const clientPath = path.join(__dirname, '..', 'dist');
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const clientPath = join(__dirname, '..', 'dist');
 app.use(express.static(clientPath));
+
 
 //Route to get game version
 app.get('/version', async (req, res) => {
-  console.log('Fetching game version');
   try {
     const response = await axios.get('https://ddragon.leagueoflegends.com/api/versions.json');
     res.json(response.data); // returns an array of versions
@@ -103,10 +109,14 @@ app.get('/mastery/:region/:puuid', async (req, res) => {
   }
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(clientPath, 'index.html'));
-});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
+//Commented out to avoid serving index.html for all routes
+/*
+app.get('*', (req, res) => {
+  res.sendFile(join(clientPath, 'index.html'));
+});
+*/
