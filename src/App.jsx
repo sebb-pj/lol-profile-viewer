@@ -60,7 +60,7 @@ const handleFetch = async () => {
   try {
 
     // 0. Obtain game version
-    const versionRes = await fetch('http://localhost:3001/version');
+    const versionRes = await fetch('/version');
     const versionData = await versionRes.json();
     const currentVersion = versionData[0]; // Latest version
     setGameVersion(currentVersion);
@@ -71,7 +71,7 @@ const handleFetch = async () => {
                             : 'asia'; // fallback for KR, JP, etc
 
     // 1. Get PUUID from Riot ID
-    const accountRes = await fetch(`http://localhost:3001/account/${riotRoutingRegion}/${gameName}/${tagLine}`);
+    const accountRes = await fetch(`/account/${riotRoutingRegion}/${gameName}/${tagLine}`);
     const accountData = await accountRes.json();
 
     console.log("Account data:", accountData); // Should contain puuid
@@ -79,7 +79,7 @@ const handleFetch = async () => {
     const puuid = accountData.puuid;
 
     // 2. Get Profile Info using PUUID and original platform region
-    const profileRes = await fetch(`http://localhost:3001/profile/${region}/${puuid}`);
+    const profileRes = await fetch(`/profile/${region}/${puuid}`);
     const profileData = await profileRes.json();
 
     console.log("Profile data:", profileData);
@@ -91,7 +91,7 @@ const handleFetch = async () => {
     setRanked(profileData.rankedStats);
 
     // 4. Add favorite champs
-    const favoriteChamps = await fetch(`http://localhost:3001/mastery/${region}/${puuid}`);
+    const favoriteChamps = await fetch(`/mastery/${region}/${puuid}`);
     const favoriteChampsData = await favoriteChamps.json();
     const favoriteChampsIds = favoriteChampsData.map(champ => champ.championId);
     setFavorites(favoriteChampsIds);
